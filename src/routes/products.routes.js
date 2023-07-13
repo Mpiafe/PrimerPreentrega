@@ -1,34 +1,56 @@
 import { Router} from "express";
-import { ProductManager } from "../dao/productManager.js";
+import { ProductManager } from "../datosArchivos/productManager.js";
 
+const router= Router ();
 
-const productService = new ProductManager('products.json');
-
-const validateFields= (req, res, next)=>{
+const validateFields = (req,res,next)=>{
     const productInfo = req.body;
-    if (!productInfo.title || !productInfo.description || productInfo.code || productInfo.price || productInfo.status || productInfo.stock || productInfo.category ){
-        return res.json ({status:"error", message: "campos incompletos"})
+    if(!productInfo.title || !productInfo.description || !productInfo.price){
+        return res.json({status:"error", message:"campos incompletos"})
     } else {
         next();
     }
 };
 
+const productService = new ProductManager('products.json');
 
-const router= Router ();
 
-router.get("/", (req,res)=>{});
+//rutas de los servicios.
+
+router.get("/", async(req,res)=>{
+    try {
+        const limit = req.query.limit;
+        const products = await productService.get();
+        if(limit){
+            //devolver productos de acuerdo al limite
+        } else {
+            res.json({status:"success", data:products});
+        }
+    } catch (error) {
+        res.json({status:"error", message:error.message});
+    }
+});
+
 router.get ("/:pid", (req,res)=>{});
-router.post ("/",validateFields, (req,res)=>{
+
+
+router.post("/", validateFields, async(req,res)=>{
+    //Agregar el producto
+    try {
+        const productInfo = req.body;
+        const productCreated = await productService.save(productInfo);
+        res.json({status:"success", data:productCreated, message:"producto creado"});
+    } catch (error) {
+        res.json({status:"error", message:error.message});
+    }
+});
+
+router.put("/:pid",validateFields,(req,res)=>{
     const productInfo = req.body;
+    //actualiza el producto
 });
+router.delete("/:pid",(req,res)=>{});
 
-router.put ("/:pid",validateFields, (req, res)=>{
-    const productInfo = req.body;
-});
-
-router.delete ("/;pid",(req, res)=>{
-
-});
 
 
 
