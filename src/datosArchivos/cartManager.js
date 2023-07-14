@@ -10,4 +10,43 @@ export class CartManager{
     fileExists(){
         return fs.existsSync(this.path);
     }
+
+    async getAll(){
+        try {
+            if(this.fileExists()){
+                const content = await fs.promises.readFile(this.path,"utf-8");
+                const carts = JSON.parse(content);
+                return carts;
+            } else {
+                throw new Error("No es posible obtener los carritos");
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    async save(){
+        try {
+            if(this.fileExists()){
+                const content = await fs.promises.readFile(this.path,"utf-8");
+                const carts = JSON.parse(content);
+                let newId = uuidv4();
+                const newCart = {
+                    id:newId,
+                    products:[]
+                };
+                carts.push(newCart);
+                await fs.promises.writeFile(this.path,JSON.stringify(carts,null,'\t'));
+                return newCart;
+            } else {
+                throw new Error("No es posible esta operacion");
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    async update(){
+
+    };
 }
