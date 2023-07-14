@@ -73,8 +73,8 @@ export class ProductManager {
     }
 //Metodo para leer productos y pasarlos a string
     saveProducts(products) {
-        const data = JSON.stringify(products, null, 2);
-        fs.writeFileSync(this.path, data);
+        const data = JSON.stringify(products,null,'\t');
+         return fs.writeFileSync(this.path, data);
     }
 
  //Metodo para generar id.   
