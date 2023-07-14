@@ -9,21 +9,28 @@ export class ProductManager {
         this.path = path.join(__dirname,`/files/${fileName}`); //src/files/products.json
     }
 
+ //Metodo para saber si el archivo existe.
     fileExists(){
         return fs.existsSync(this.path);
     }
 
-     async getProducts() {
-        try {
-            const data =  await fs.readFileSync(this.path, 'utf-8');
-            return JSON.parse(data);
-        } catch (error) {
-            // Si el archivo no existe o está vacío, retorna un arreglo vacío
-            return [];
-        }
-    }
-;
 
+ //Metodo para obtener productos.
+       async getProducts(){
+        try {
+            if(this.fileExists()){
+                const content = await fs.promises.readFile(this.path,"utf-8");
+                const products = JSON.parse(content);
+                return products;
+            } else {
+                throw new Error("No es posible obtener los productos");
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+//Metodo para agregar productos.
     addProduct(product) {
         const products = this.getProducts();
         product.id = this.generateId(products);
@@ -32,12 +39,12 @@ export class ProductManager {
         return product.id;
     }
 
-
+ //Metodo para obtenet productos por id
     getProductById(id) {
         const products = this.getProducts();
         return products.find(product => product.id === id);
     }
-
+ //Metodo para actualizar productos.
     updateProduct(id, updatedFields) {
         const products = this.getProducts();
         const index = products.findIndex(product => product.id === id);
@@ -51,7 +58,7 @@ export class ProductManager {
 
         return false;
     }
-
+ //Metodo para eliminar productos.
     deleteProduct(id) {
         const products = this.getProducts();
         const index = products.findIndex(product => product.id === id);
@@ -64,12 +71,13 @@ export class ProductManager {
 
         return false;
     }
-
+//Metodo para leer productos y pasarlos a string
     saveProducts(products) {
         const data = JSON.stringify(products, null, 2);
         fs.writeFileSync(this.path, data);
     }
 
+ //Metodo para generar id.   
     generateId(products) {
         if (products.length === 0) {
             return 1;

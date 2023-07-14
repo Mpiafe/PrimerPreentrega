@@ -7,6 +7,7 @@ const cartService = new CartManager("carts.json");
 
 const router = Router();
 
+//crear un carrito
 router.post("/", async(req,res)=>{
     try {
         const cartCreated = await cartService.save();
@@ -16,7 +17,6 @@ router.post("/", async(req,res)=>{
     }
 });
 
-router.get("/:cid", (req,res)=>{});
 
 router.post("/:cid/product/:pid", async(req,res)=>{
     try {
@@ -26,5 +26,7 @@ router.post("/:cid/product/:pid", async(req,res)=>{
         res.json({status:"error", message:error.message});
     }
 });
+
+router.get("/:cid", (req,res)=>{});
 
 export { router as cartsRouter}
