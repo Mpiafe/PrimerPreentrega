@@ -59,23 +59,28 @@ router.put("/:pid",validateFields, async (req,res)=>{
 
 //devolver productos segun id.
 router.get ("/:pid", (req,res)=>{
-    const userId = parseInt(req.params.userId);
-    // console.log("userId",userId);
-    const user = users.find(elm=>elm.id === userId);
-    if(!user){
-        res.send("El usuario no existe");
+    const productId = parseInt(req.params.productId);
+    const product = products.find(elm=>elm.id === productId);
+    if(!product){
+        res.send("El producto no existe");
     } else {
-        res.send(user);
+        res.send(product);
     }
 });
 
 
 //eliminar el producto
 router.delete("/:pid",(req,res)=>{
-
+    const productId = parseInt(req.params.productId);
+    const product = products.find(elm=>elm.id === productId);  
+    if(product){
+    const newProduct = products.filter(elm=>elm.id === productId); 
+    product =newProduct;
+    res.json({status:"success", message:"usuario eliminado"});
+} else {
+    res.status(404).json({status:"error", message:"el usuario no existe"});
+}
 });
-
-
 
 
 export { router as productsRouter}
