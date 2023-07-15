@@ -24,13 +24,16 @@ export class CartManager{
             throw error;
         }
     };
-
+ //funcion para crear el carrito
     async save(){
         try {
             if(this.fileExists()){
                 const content = await fs.promises.readFile(this.path,"utf-8");
                 const carts = JSON.parse(content);
-                let newId = uuidv4();
+                let newId = 1;
+                if(carts.length>0){
+                newId= carts[carts.length-1].id+1;
+                    }
                 const newCart = {
                     id:newId,
                     products:[]
