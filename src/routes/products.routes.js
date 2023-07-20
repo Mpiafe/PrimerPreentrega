@@ -27,7 +27,7 @@ router.get("/", async(req,res)=>{
             result = result.slice(0, limit);
             return res.send(result);
         } else {
-            res.json({status:"success", data:products});
+            res.json({status:"success", data:result});
         }
     } catch (error) {
         res.json({status:"error", message:error.message});
@@ -59,27 +59,33 @@ router.put("/:pid",validateFields, async (req,res)=>{
 
 //devolver productos segun id.
 router.get ("/:pid", (req,res)=>{
-    const productId = parseInt(req.params.productId);
+ try {
+    const productId = parseInt(req.params.pid);
     const product = products.find(elm=>elm.id === productId);
     if(!product){
         res.send("El producto no existe");
-    } else {
+    }else {
         res.send(product);
     }
+    } catch (error) {
+        res.json({status:"error", message:error.message});
+ } 
 });
 
 
 //eliminar el producto
 router.delete("/:pid",(req,res)=>{
-    const productId = parseInt(req.params.productId);
-    const product = products.find(elm=>elm.id === productId);  
-    if(product){
-    const newProduct = products.filter(elm=>elm.id === productId); 
-    product =newProduct;
-    res.json({status:"success", message:"usuario eliminado"});
-} else {
-    res.status(404).json({status:"error", message:"el usuario no existe"});
-}
+    try {
+        const productId = parseInt(req.params.pid);
+        const product = products.find(elm=>elm.id === productId);  
+        if(product){
+        const newProduct = products.filter(elm=>elm.id === productId); 
+        product =newProduct;
+        res.json({status:"success", message:"usuario eliminado"})};
+        
+    } catch (error) {
+        res.status(404).json({status:"error", message:"el usuario no existe"});  
+    }
 });
 
 
