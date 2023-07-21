@@ -19,26 +19,44 @@ const productService = new ProductManager('products.json');
 //rutas de los servicios.
 
 //devolver productos de acuerdo al limite
-router.get("/", async(req,res)=>{
-    try {
-        let limit = parseInt(req.query.limit);
-        let result = await productsService.getProducts();
-        if (limit) {
-            result = result.slice(0, limit);
-            return res.send(result);
-        } else {
-            res.json({status:"success", data:result});
-        }
-    } catch (error) {
-        res.json({status:"error", message:error.message});
-        }
+router.get("/products",(req,res)=>{
+            try {
+                const result = ProductManager.getProducts();
+                console.log("result: ", result);
+                const limite = parseInt(req.query.limit);
+                console.log("limite: ", limite);
+                if (limite>0) {
+                    resultado = result.filter(producto=>producto.id <= limite);
+                } else {
+                    resultado = result;
+                }
+                res.send(resultado);
+            } catch (error) {
+                res.json({status:"error", message:error.message});
+            }
         });
 
+//devolver productos segun id.
+router.get ("/:pid", (req,res)=>{
+    try {
+       const productId = parseInt(req.params.pid);
+       const product = productService.getProductById(pid);
+       if(!product){
+           res.send("El producto no existe");
+       }else {
+           res.send(product);
+       }
+       } catch (error) {
+           res.json({status:"error", message:error.message});
+    } 
+   });
+
+  
 //Agregar el producto
 router.post("/", validateFields, async(req,res)=>{
     try {
         const productInfo = req.body;
-        const productCreated = await productService.saveProducts(productInfo);
+        const productCreated = await productService.addProduct(productInfo);
         res.json({status:"success", data:productCreated, message:"producto creado"});
     } catch (error) {
         res.json({status:"error", message:error.message});
@@ -57,36 +75,24 @@ router.put("/:pid",validateFields, async (req,res)=>{
    
 });
 
-//devolver productos segun id.
-router.get ("/:pid", (req,res)=>{
- try {
-    const productId = parseInt(req.params.pid);
-    const product = products.find(elm=>elm.id === productId);
-    if(!product){
-        res.send("El producto no existe");
-    }else {
-        res.send(product);
-    }
-    } catch (error) {
-        res.json({status:"error", message:error.message});
- } 
-});
-
-
 //eliminar el producto
-router.delete("/:pid",(req,res)=>{
+router.delete('/productos/:id',(req,res)=>{
     try {
         const productId = parseInt(req.params.pid);
-        const product = products.find(elm=>elm.id === productId);  
-        if(product){
-        const newProduct = products.filter(elm=>elm.id === productId); 
-        product =newProduct;
-        res.json({status:"success", message:"usuario eliminado"})};
+        const productIndex = products.findIndex((product) => product.id === productId);
+           if (productIndex !== -1) {
+      // Eliminamos el producto encontrado del array.
+           products.splice(productIndex, 1);
+           return res.status(200).json({ message: 'Producto eliminado con éxito.' });
+        } else {
+         return res.status(404).json({ message: 'Producto no encontrado.' })}
         
-    } catch (error) {
+        } catch (error) {
         res.status(404).json({status:"error", message:"el usuario no existe"});  
     }
 });
+
+
 
 
 export { router as productsRouter}
