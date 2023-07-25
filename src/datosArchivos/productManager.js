@@ -39,7 +39,7 @@ export class ProductManager {
         return product.id;
     }
 
- //Metodo para obtenet productos por id
+ //Metodo para obtener productos por id
     getProductById(id) {
         const products = this.getProducts();
         return products.find(product => product.id === id);

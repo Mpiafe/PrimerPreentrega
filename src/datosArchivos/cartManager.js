@@ -11,6 +11,7 @@ export class CartManager{
         return fs.existsSync(this.path);
     }
 
+    //Funcion para obtener carrito
     async getAll(){
         try {
             if(this.fileExists()){
@@ -29,7 +30,7 @@ export class CartManager{
         try {
             if(this.fileExists()){
                 const content = await fs.promises.readFile(this.path,"utf-8");
-                const carts = JSON.parse(content);
+                const carts = JSON.parse(carts);
                 let newId = 1;
                 if(carts.length>0){
                 newId= carts[carts.length-1].id+1;
@@ -49,7 +50,23 @@ export class CartManager{
         }
     };
 
-    async update(){
+    updatedCart(id, updatedFields) {
+        const cart = this.getAll();
+        const index = cart.findIndex(cart => cart.id === id);
 
-    };
+        if (index !== -1) {
+            const updatedCart = { ...cart[index], ...updatedFields };
+            cart[index] = updatedCart;
+            this.save(cart);
+            return true;
+        }
+
+        return false;
+    }
+
+    //Metodo para obtener el id del Carrito.
+    getCartById(id) {
+        const carts = this.getAll();
+        return carts.find(cart => cart.id === id);
+    }
 }

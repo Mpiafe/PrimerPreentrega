@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { CartManager } from "../dao/cartManager.js";
-import { ProductManager } from "../dao/productManager.js";
+import { CartManager } from "../datosArchivos/cartManager.js";
+import { ProductManager } from "../datosArchivos/productManager.js";
 
 const cartService = new CartManager("carts.json");
 const productService = new ProductManager("products.json");
@@ -16,31 +16,45 @@ router.post("/", async(req,res)=>{
     }
 });
 
-router.get("/:cid", (req,res)=>{});
-
-router.post("/:cid/product/:pid", async(req,res)=>{
+router.get("/:cid", async (req,res)=>{
     try {
         const cartId = req.params.cid;
-        const productId = req.params.pid;
-        // const cart = await cartService.getById(cartId);
-        // const product = await productService.getById(productId);
-        //verificar si el producto ya existe en ese carrito
-        //condicion
-        //si existe el producto, a ese producto a la cantidad le suman 1
-
-        //si no existe el producto, agregar el nuevo producto al carrito
-            // const newProduct = {
-            //     product:productId,
-            //     quantity:1
-            // }
-            // cartId.products.push(newProduct);
-
-        //actualizar el carrito
-        // await cartService.update(cartId, cart);
-        res.json({status:"success", data:cartCreated});
+        const cart = await cartService.getCartById(cartId);
+        if (!cart) {
+        return res.status(404).json({ error: "Cart not found" });
+        } else {
+            res.send(cart);
+        }
     } catch (error) {
         res.json({status:"error", message:error.message});
     }
 });
 
+router.post("/:cid/product/:pid", async(req,res)=>{
+    try { 
+        const { cid, pid } = req.params;
+        const cart = await cartService.getCartById(cartId);
+        if (!cart) {
+        return res.status(404).json({ error: "Cart not found" });
+        }  else {
+            res.send(cart);
+        }
+        const existProduct = cart.products.find((product) => product.id === pid);
+       if (existProduct) {
+      existProduct.quantity += 1;
+       } else {
+        const newProduct = {
+        product: pid,
+        quantity: 1,
+      };
+    }
+    cart.products.push(newProduct);
+        
+    } catch (error) {
+        res.status(200).json({ message: "Product added to cart successfully" });
+    }});
+    
+  
+
+ 
 export {router as cartsRouter}
