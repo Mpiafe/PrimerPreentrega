@@ -19,28 +19,26 @@ const productService = new ProductManager('products.json');
 //rutas de los servicios.
 
 //devolver productos de acuerdo al limite
-router.get("/products",(req,res)=>{
-            try {
-                const result = ProductManager.getProducts();
-                console.log("result: ", result);
-                const limite = parseInt(req.query.limit);
-                console.log("limite: ", limite);
-                if (limite>0) {
-                    resultado = result.filter(producto=>producto.id <= limite);
-                } else {
-                    resultado = result;
-                }
-                res.send(resultado);
-            } catch (error) {
-                res.json({status:"error", message:error.message});
+router.get("/",validateFields, async(req,res)=>{
+         try {
+         const limit = req.query.limit;
+         const products = await productService.getProducts();
+         if(limit){
+            const limitedProducts = products.slice(0, parseInt(limit));
+            res.send(limitedProducts);
+            } else {
+            res.json({status:"success", data:products});
             }
-        });
+        } catch (error) {
+        res.json({status:"error", message:error.message});
+    }
+});
 
 //devolver productos segun id.
-router.get ("/:pid", (req,res)=>{
+router.get ("/:pid", async (req,res)=>{
     try {
        const productId = parseInt(req.params.pid);
-       const product = productService.getProductById(pid);
+       const product =  await productService.getProductById(productId);
        if(!product){
            res.send("El producto no existe");
        }else {
@@ -76,10 +74,10 @@ router.put("/:pid",validateFields, async (req,res)=>{
 });
 
 //eliminar el producto
-router.delete('/productos/:id',(req,res)=>{
+router.delete('/productos/:id', async(req,res)=>{
     try {
         const productId = parseInt(req.params.pid);
-        const productIndex = products.findIndex((product) => product.id === productId);
+        const productIndex = await products.findIndex((product) => product.id === productId);
            if (productIndex !== -1) {
       // Eliminamos el producto encontrado del array.
            products.splice(productIndex, 1);
